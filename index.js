@@ -102,6 +102,10 @@ export default class AliyunPush {
             });
         }
     }
+    //根据ID获取全部通知消息，测试环境是T开头，正式环境是P开头
+    static getAllNotificationMessages = (userId) => {
+        return AliyunPushNative.getAllNotificationMessages();
+    }
 
 
     static addListener = (callback) => {

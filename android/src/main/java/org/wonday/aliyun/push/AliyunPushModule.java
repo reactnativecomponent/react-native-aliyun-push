@@ -8,39 +8,25 @@
 
 package org.wonday.aliyun.push;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import android.content.BroadcastReceiver;
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.Context;
-import android.os.Handler;
-
-import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.facebook.common.logging.FLog;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
-import com.facebook.common.logging.FLog;
 
-import com.alibaba.sdk.android.push.CloudPushService;
-import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
-import com.alibaba.sdk.android.push.CommonCallback;
+import java.util.HashMap;
+import java.util.Map;
+
 import me.leolin.shortcutbadger.ShortcutBadger;
-
-import org.wonday.aliyun.push.MIUIUtils;
 
 public class AliyunPushModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
     private final ReactApplicationContext context;
@@ -248,6 +234,32 @@ public class AliyunPushModule extends ReactContextBaseJavaModule implements Life
                 promise.reject(code, message);
             }
         });
+    }
+    @ReactMethod
+    public void getAllNotificationMessages(Promise promise){
+        WritableArray array = Arguments.createArray();
+        if (AliyunPushMessageReceiver.instance != null) {
+            for (Map<String, Object> map : AliyunPushMessageReceiver.instance.array) {
+                WritableMap item = Arguments.createMap();
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    Object value = entry.getValue();
+                    if (value instanceof String) {
+                        item.putString(entry.getKey(), (String) entry.getValue());
+                    } else if (value instanceof HashMap) {
+                        WritableMap item2 = Arguments.createMap();
+                        Map<String, String> map2 = (Map<String, String>) value;
+                        for (Map.Entry<String, String> entry2 : map2.entrySet()) {
+                            item2.putString(entry2.getKey(), entry2.getValue());
+                        }
+                        item.putMap(entry.getKey(), item2);
+                    }
+                }
+                array.pushMap(item);
+            }
+            promise.resolve(array);
+        } else {
+            promise.resolve(array);
+        }
     }
 
     @Override

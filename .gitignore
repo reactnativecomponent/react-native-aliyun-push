@@ -45,3 +45,5 @@ yarn-error.log
 .flowconfig
 .gitattributes
 .watchmanconfig
+android/build/
+android/react-native-aliyun-push.iml

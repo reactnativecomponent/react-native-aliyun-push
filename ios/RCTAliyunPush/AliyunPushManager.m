@@ -31,10 +31,13 @@
 
 NSString *const ALIYUN_PUSH_TYPE_MESSAGE = @"message";
 NSString *const ALIYUN_PUSH_TYPE_NOTIFICATION = @"notification";
-
+NSString *const ALIYUN_PUSH_NOTIFICATIONMSGS = @"notificationmsgs";
+NSString *const ALIYUN_PUSH_PRIVATE = @"privateData";
+NSString *const ALIYUN_PUSH_PUBLIC = @"publicData";
 
 
 @interface AliyunPushManager () <UNUserNotificationCenterDelegate>
+@property (strong, nonatomic) NSMutableArray *allMessageArr;
 @end
 
 @implementation AliyunPushManager
@@ -309,6 +312,18 @@ RCT_EXPORT_METHOD(getAuthorizationStatus:(RCTResponseSenderBlock)callback)
     }
 }
 
+/**
+ * 主动获取本地推送消息数据
+ */
+RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if (!self.allMessageArr) {
+        self.allMessageArr = [NSMutableArray array];
+    }
+    resolve(self.allMessageArr);
+}
+
+
 #pragma mark
 - (NSArray<NSString *> *)supportedEvents
 {
@@ -572,11 +587,11 @@ RCT_EXPORT_METHOD(getAuthorizationStatus:(RCTResponseSenderBlock)callback)
     
     // 取得APNS通知内容
     NSDictionary *aps = [userInfo valueForKey:@"aps"];
-    
+    NSLog(@"------aps:%@",aps);
     NSMutableDictionary *notificationDict = [NSMutableDictionary dictionary];
     
     // 通知时间
-    notificationDict[@"date"] = [NSDate init];
+//    notificationDict[@"date"] = [NSDate init];
     
     // 标题
     notificationDict[@"title"] = @"";
@@ -658,18 +673,22 @@ RCT_EXPORT_METHOD(getAuthorizationStatus:(RCTResponseSenderBlock)callback)
     CCPSysMessage *message = [notification object];
     
     notificationDict[@"title"] = [[NSString alloc] initWithData:message.title encoding:NSUTF8StringEncoding];
-    notificationDict[@"body"] = [[NSString alloc] initWithData:message.body encoding:NSUTF8StringEncoding];
+    NSString *strBody = [[NSString alloc] initWithData:message.body encoding:NSUTF8StringEncoding];
+    NSData *dataBody = [strBody dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *bodyDict = [NSJSONSerialization JSONObjectWithData:dataBody options:NSJSONReadingMutableLeaves error:nil];
+    notificationDict[@"body"] = bodyDict;
     // 取得通知自定义字段内容
     if (notification.userInfo) {
         notificationDict[@"extras"] = notification.userInfo;
     } else {
         notificationDict[@"extras"] = @{};
     }
-    
-    
     // 类型 “notification” or "message"
     notificationDict[@"type"] = ALIYUN_PUSH_TYPE_MESSAGE;
-    
+    if (!self.allMessageArr) {
+        self.allMessageArr = [NSMutableArray array];
+    }
+    [self.allMessageArr addObject:notificationDict];
     [self sendEventToJs:notificationDict];
     
 }
@@ -681,16 +700,17 @@ RCT_EXPORT_METHOD(getAuthorizationStatus:(RCTResponseSenderBlock)callback)
     for (NSString *key in notification) {
         DLog(@"key: %@ value: %@", key, notification[key]);
     }
-
+    
     //修正app退出后，点击通知会闪退bug
-    AliyunPushManager* __weak weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        //修正app退出后，点击通知会闪退bug
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive
            ||[UIApplication sharedApplication].applicationState == UIApplicationStateInactive) {
-            [weakSelf sendEventWithName:@"aliyunPushReceived" body:notification];
+            [self sendEventWithName:@"aliyunPushReceived" body:notification];
         }
     });
+
 }
+
+
 
 @end
