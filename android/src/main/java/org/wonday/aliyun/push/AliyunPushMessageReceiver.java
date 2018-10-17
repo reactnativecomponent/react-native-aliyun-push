@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2017-present, Wonday (@wonday.org)
  * All rights reserved.
- *
+ * <p>
  * This source code is licensed under the MIT-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 public class AliyunPushMessageReceiver extends MessageReceiver {
     public static ReactApplicationContext context;
     public static AliyunPushMessageReceiver instance;
-    public List<Map<String,Object>>  array = new ArrayList();
+    public static List<Map<String, Object>> array = new ArrayList();
 
     private final String ALIYUN_PUSH_TYPE_MESSAGE = "message";
     private final String ALIYUN_PUSH_TYPE_NOTIFICATION = "notification";
@@ -40,9 +40,20 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
     }
 
     @Override
-    protected void onMessage(Context context, CPushMessage cPushMessage) {
+    protected void onMessage(final Context context, final CPushMessage cPushMessage) {
 
         super.onMessage(context, cPushMessage);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SQLiteHelper.getInstance(context).insertMsg(cPushMessage.getContent());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         WritableMap params = Arguments.createMap();
         params.putString("messageId", cPushMessage.getMessageId());
@@ -50,7 +61,7 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
         params.putString("title", cPushMessage.getTitle());
         params.putString("type", ALIYUN_PUSH_TYPE_MESSAGE);
 
-        Map<String,Object> params2 = new HashMap<>();
+        Map<String, Object> params2 = new HashMap<>();
         params2.put("messageId", cPushMessage.getMessageId());
         params2.put("body", cPushMessage.getContent());
         params2.put("title", cPushMessage.getTitle());
@@ -71,19 +82,19 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 
         WritableMap extraWritableMap = Arguments.createMap();
         for (Map.Entry<String, String> entry : extraMap.entrySet()) {
-            extraWritableMap.putString(entry.getKey(),entry.getValue());
+            extraWritableMap.putString(entry.getKey(), entry.getValue());
         }
         params.putMap("extras", extraWritableMap);
 
         params.putString("type", ALIYUN_PUSH_TYPE_NOTIFICATION);
 
-        Map<String,Object> params2 = new HashMap<>();
+        Map<String, Object> params2 = new HashMap<>();
         params2.put("body", content);
         params2.put("title", title);
 
-        Map<String,String> extraWritableMap2 = new HashMap<>();
+        Map<String, String> extraWritableMap2 = new HashMap<>();
         for (Map.Entry<String, String> entry : extraMap.entrySet()) {
-            extraWritableMap2.put(entry.getKey(),entry.getValue());
+            extraWritableMap2.put(entry.getKey(), entry.getValue());
         }
         params2.put("extras", extraWritableMap2);
 
@@ -127,8 +138,8 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
     }
 
     @Override
-    protected void onNotificationRemoved(Context context, String messageId){
-        FLog.d(ReactConstants.TAG, "onNotificationRemoved: messageId=" +  messageId);
+    protected void onNotificationRemoved(Context context, String messageId) {
+        FLog.d(ReactConstants.TAG, "onNotificationRemoved: messageId=" + messageId);
 
         super.onNotificationRemoved(context, messageId);
 
@@ -156,7 +167,7 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 
         WritableMap extraWritableMap = Arguments.createMap();
         for (Map.Entry<String, String> entry : extraMap.entrySet()) {
-            extraWritableMap.putString(entry.getKey(),entry.getValue());
+            extraWritableMap.putString(entry.getKey(), entry.getValue());
         }
         params.putMap("extras", extraWritableMap);
 
@@ -168,9 +179,9 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
     private void sendEvent(String eventName, @Nullable WritableMap params) {
         if (context == null) {
             FLog.d(ReactConstants.TAG, "reactContext==null");
-        }else{
+        } else {
             context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
+                    .emit(eventName, params);
         }
     }
 }
