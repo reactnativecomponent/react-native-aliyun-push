@@ -131,6 +131,94 @@ public class AliyunPushUtils {
                 }
             }
         }
+    }
 
+    public static WritableMap createBody(String content){
+        try {
+            JSONObject object = new JSONObject(content);
+            String msgtype = object.optString(SQLiteHelper.key_msgtype);
+            String msgId = object.optString(SQLiteHelper.key_msgId);
+            String timeString = object.optString(SQLiteHelper.key_timeString);
+
+            JSONObject data = object.optJSONObject("data");
+            Log.v(AliyunPushUtils.class.getName(), data.toString());
+            String account = data.optString(SQLiteHelper.key_data_account);
+            String title = data.optString(SQLiteHelper.key_data_title);
+            String date = data.optString(SQLiteHelper.key_data_date);
+            String time = data.optString(SQLiteHelper.key_data_time);
+            WritableMap obj = createHeader(msgId, msgtype, timeString);
+
+
+            if ("url".equals(msgtype)) {
+                String describe = data.optString(SQLiteHelper.key_data_describe);
+                String image = data.optString(SQLiteHelper.key_data_image);
+                String linkUrl = data.optString(SQLiteHelper.key_data_linkUrl);
+                obj.putMap("data", createMapUrl(title, date, time, account,
+                        describe, image, linkUrl));
+            } else if ("text".equals(msgtype)) {
+                String body = data.optString(SQLiteHelper.key_data_body);
+                obj.putMap("data", createMapText(title, date, time, account,
+                        body));
+            } else if ("account_notice".equals(msgtype)) {
+                String amount = data.optString(SQLiteHelper.key_data_amount);
+                String body = data.optString(SQLiteHelper.key_data_body);
+                String describe = data.optString(SQLiteHelper.key_data_describe);
+                String redirectType = data.optString(SQLiteHelper.key_data_redirectType);
+                String redirectData = data.optString(SQLiteHelper.key_data_redirectData);
+                obj.putMap("data", createMapAccountNotice(title, date, time, account,
+                        amount, body, describe, redirectType, redirectData));
+            }
+            return obj;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Arguments.createMap();
+    }
+    public static WritableMap createMapData(String title, String date, String time, String account) {
+        WritableMap data = Arguments.createMap();
+        data.putString(SQLiteHelper.key_data_title, title);
+        data.putString(SQLiteHelper.key_data_date, date);
+        data.putString(SQLiteHelper.key_data_time, time);
+        data.putString(SQLiteHelper.key_data_account, account);
+        return data;
+    }
+
+    public static WritableMap createMapUrl(String title, String date, String time, String account,
+                             String describe, String image, String linkUrl) {
+        WritableMap url = createMapData(title, date, time, account);
+
+        url.putString(SQLiteHelper.key_data_describe, describe);
+        url.putString(SQLiteHelper.key_data_image, image);
+        url.putString(SQLiteHelper.key_data_linkUrl, linkUrl);
+        return url;
+    }
+
+    public static WritableMap createMapText(String title, String date, String time, String account,
+                              String body) {
+        WritableMap text = createMapData(title, date, time, account);
+
+        text.putString(SQLiteHelper.key_data_body, body);
+        return text;
+    }
+
+    public static WritableMap createMapAccountNotice(String title, String date, String time, String account,
+                                       String amount, String body, String describe, String redirectType, String redirectData) {
+        WritableMap text = createMapData(title, date, time, account);
+
+        text.putString(SQLiteHelper.key_data_amount, amount);
+        text.putString(SQLiteHelper.key_data_body, body);
+        text.putString(SQLiteHelper.key_data_describe, describe);
+        text.putString(SQLiteHelper.key_data_redirectType, redirectType);
+        text.putString(SQLiteHelper.key_data_redirectData, redirectData);
+        return text;
+    }
+
+    public static WritableMap createHeader(String msgId, String msgtype, String timeString) {
+
+        WritableMap map = Arguments.createMap();
+        map.putString(SQLiteHelper.key_msgId, msgId);
+        map.putString(SQLiteHelper.key_msgtype, msgtype);
+        map.putString(SQLiteHelper.key_timeString, timeString);
+        return map;
     }
 }

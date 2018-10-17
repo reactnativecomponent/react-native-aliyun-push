@@ -32,7 +32,7 @@ public class AliyunPushModule extends ReactContextBaseJavaModule implements Life
         super(reactContext);
         this.context = reactContext;
         this.badgeNumber = 0;
-        SQLiteHelper.getInstance(context);
+        SQLiteHelper.getInstance(context.getApplicationContext());
         AliyunPushMessageReceiver.context = reactContext;
         ThirdPartMessageActivity.context = reactContext;
 
@@ -250,11 +250,12 @@ public class AliyunPushModule extends ReactContextBaseJavaModule implements Life
             promise.reject(e);
         }
     }
+
     @ReactMethod
     public void queryMessages(String account, int page, Promise promise) {
 
         try {
-            WritableArray array = SQLiteHelper.getInstance(context).query(account,page,20);
+            WritableArray array = SQLiteHelper.getInstance(context).query(account, page <= 0 ? 1 : page, 20);
             promise.resolve(array);
         } catch (Exception e) {
             e.printStackTrace();

@@ -19,9 +19,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -29,7 +26,7 @@ import javax.annotation.Nullable;
 public class AliyunPushMessageReceiver extends MessageReceiver {
     public static ReactApplicationContext context;
     public static AliyunPushMessageReceiver instance;
-    public static List<Map<String, Object>> array = new ArrayList();
+//    public static List<Map<String, Object>> array = new ArrayList();
 
     private final String ALIYUN_PUSH_TYPE_MESSAGE = "message";
     private final String ALIYUN_PUSH_TYPE_NOTIFICATION = "notification";
@@ -48,7 +45,7 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
             @Override
             public void run() {
                 try {
-                    SQLiteHelper.getInstance(context).insertMsg(cPushMessage.getContent());
+                    SQLiteHelper.getInstance(context.getApplicationContext()).insertMsg(cPushMessage.getContent());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -57,16 +54,16 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 
         WritableMap params = Arguments.createMap();
         params.putString("messageId", cPushMessage.getMessageId());
-        params.putString("body", cPushMessage.getContent());
+        params.putMap("body", AliyunPushUtils.createBody(cPushMessage.getContent()));
         params.putString("title", cPushMessage.getTitle());
         params.putString("type", ALIYUN_PUSH_TYPE_MESSAGE);
 
-        Map<String, Object> params2 = new HashMap<>();
-        params2.put("messageId", cPushMessage.getMessageId());
-        params2.put("body", cPushMessage.getContent());
-        params2.put("title", cPushMessage.getTitle());
-        params2.put("type", ALIYUN_PUSH_TYPE_MESSAGE);
-        array.add(params2);
+//        Map<String, Object> params2 = new HashMap<>();
+//        params2.put("messageId", cPushMessage.getMessageId());
+//        params2.put("body", AliyunPushUtils.createBody(cPushMessage.getContent()));
+//        params2.put("title", cPushMessage.getTitle());
+//        params2.put("type", ALIYUN_PUSH_TYPE_MESSAGE);
+//        array.add(params2);
         sendEvent("aliyunPushReceived", params);
     }
 
@@ -88,18 +85,18 @@ public class AliyunPushMessageReceiver extends MessageReceiver {
 
         params.putString("type", ALIYUN_PUSH_TYPE_NOTIFICATION);
 
-        Map<String, Object> params2 = new HashMap<>();
-        params2.put("body", content);
-        params2.put("title", title);
-
-        Map<String, String> extraWritableMap2 = new HashMap<>();
-        for (Map.Entry<String, String> entry : extraMap.entrySet()) {
-            extraWritableMap2.put(entry.getKey(), entry.getValue());
-        }
-        params2.put("extras", extraWritableMap2);
-
-        params2.put("type", ALIYUN_PUSH_TYPE_NOTIFICATION);
-        array.add(params2);
+//        Map<String, Object> params2 = new HashMap<>();
+//        params2.put("body", content);
+//        params2.put("title", title);
+//
+//        Map<String, String> extraWritableMap2 = new HashMap<>();
+//        for (Map.Entry<String, String> entry : extraMap.entrySet()) {
+//            extraWritableMap2.put(entry.getKey(), entry.getValue());
+//        }
+//        params2.put("extras", extraWritableMap2);
+//
+//        params2.put("type", ALIYUN_PUSH_TYPE_NOTIFICATION);
+//        array.add(params2);
         sendEvent("aliyunPushReceived", params);
     }
 

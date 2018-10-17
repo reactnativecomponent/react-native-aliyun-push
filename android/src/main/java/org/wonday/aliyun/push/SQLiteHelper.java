@@ -165,7 +165,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         String limit = (page - 1) * size + "," + size;
         String selection = key_data_account + " = ?";
         String orderBy = key_timeString + " DESC";
-        String[] selectionArgs = new String[]{keyAccount};
+        String[] selectionArgs = new String[]{keyAccount == null ? "" : keyAccount};
         Cursor cursor = database.query(TABLE_NAME, null, "" + selection, selectionArgs, null, null,
                 "" + orderBy, "" + limit);
         WritableArray array = Arguments.createArray();
@@ -229,11 +229,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         return array;
     }
-    public void delete(){
+
+    public void delete() {
         String selection = key_data_account + " = ?";
         String[] selectionArgs = new String[]{""};
-        database.delete(TABLE_NAME,null,null);
+        database.delete(TABLE_NAME, null, null);
     }
+
     WritableMap createMapData(String title, String date, String time, String account) {
         WritableMap data = Arguments.createMap();
         data.putString(key_data_title, title);
