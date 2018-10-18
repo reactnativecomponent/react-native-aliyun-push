@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E1F6979217735F400918F7F /* DWMsgModel+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E1F6977217735F400918F7F /* DWMsgModel+CoreDataClass.m */; };
+		4E1F697A217735F400918F7F /* DWMsgModel+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E1F6978217735F400918F7F /* DWMsgModel+CoreDataProperties.m */; };
+		4E1F697D2177364A00918F7F /* DWCoreDataTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E1F697C2177364A00918F7F /* DWCoreDataTool.m */; };
 		52AE78811EEAA3F4005ECD74 /* AliyunPushManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 52AE78801EEAA3F4005ECD74 /* AliyunPushManager.m */; };
 		52FF27CE1EEBF34D00CD75F7 /* AlicloudUtils.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52FF27CB1EEBF34D00CD75F7 /* AlicloudUtils.framework */; };
 		52FF27CF1EEBF34D00CD75F7 /* CloudPushSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52FF27CC1EEBF34D00CD75F7 /* CloudPushSDK.framework */; };
@@ -27,6 +30,12 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRCTAliyunPush.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRCTAliyunPush.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E1F6975217735F400918F7F /* DWMsgModel+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DWMsgModel+CoreDataProperties.h"; sourceTree = "<group>"; };
+		4E1F6976217735F400918F7F /* DWMsgModel+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DWMsgModel+CoreDataClass.h"; sourceTree = "<group>"; };
+		4E1F6977217735F400918F7F /* DWMsgModel+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DWMsgModel+CoreDataClass.m"; sourceTree = "<group>"; };
+		4E1F6978217735F400918F7F /* DWMsgModel+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DWMsgModel+CoreDataProperties.m"; sourceTree = "<group>"; };
+		4E1F697B2177364A00918F7F /* DWCoreDataTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWCoreDataTool.h; sourceTree = "<group>"; };
+		4E1F697C2177364A00918F7F /* DWCoreDataTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWCoreDataTool.m; sourceTree = "<group>"; };
 		52AE787F1EEAA3F4005ECD74 /* AliyunPushManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AliyunPushManager.h; sourceTree = "<group>"; };
 		52AE78801EEAA3F4005ECD74 /* AliyunPushManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AliyunPushManager.m; sourceTree = "<group>"; };
 		52FF27CB1EEBF34D00CD75F7 /* AlicloudUtils.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AlicloudUtils.framework; path = libs/AlicloudUtils.framework; sourceTree = "<group>"; };
@@ -59,10 +68,24 @@
 		27F5D7ED1D0BC820003F92DE /* RCTAliyunPush */ = {
 			isa = PBXGroup;
 			children = (
+				4E1F69712177353100918F7F /* DWMsgModel */,
 				52AE787F1EEAA3F4005ECD74 /* AliyunPushManager.h */,
 				52AE78801EEAA3F4005ECD74 /* AliyunPushManager.m */,
+				4E1F697B2177364A00918F7F /* DWCoreDataTool.h */,
+				4E1F697C2177364A00918F7F /* DWCoreDataTool.m */,
 			);
 			path = RCTAliyunPush;
+			sourceTree = "<group>";
+		};
+		4E1F69712177353100918F7F /* DWMsgModel */ = {
+			isa = PBXGroup;
+			children = (
+				4E1F6975217735F400918F7F /* DWMsgModel+CoreDataProperties.h */,
+				4E1F6976217735F400918F7F /* DWMsgModel+CoreDataClass.h */,
+				4E1F6977217735F400918F7F /* DWMsgModel+CoreDataClass.m */,
+				4E1F6978217735F400918F7F /* DWMsgModel+CoreDataProperties.m */,
+			);
+			path = DWMsgModel;
 			sourceTree = "<group>";
 		};
 		52FF27D11EEBF38500CD75F7 /* Frameworks */ = {
@@ -140,6 +163,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E1F697D2177364A00918F7F /* DWCoreDataTool.m in Sources */,
+				4E1F697A217735F400918F7F /* DWMsgModel+CoreDataProperties.m in Sources */,
+				4E1F6979217735F400918F7F /* DWMsgModel+CoreDataClass.m in Sources */,
 				52AE78811EEAA3F4005ECD74 /* AliyunPushManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

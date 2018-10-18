@@ -13,6 +13,8 @@
 
 #import "AliyunPushManager.h"
 #import <CloudPushSDK/CloudPushSDK.h>
+#import "DWCoreDataTool.h"
+
 
 // iOS 10 notification
 #import <UserNotifications/UserNotifications.h>
@@ -37,12 +39,12 @@ NSString *const ALIYUN_PUSH_PUBLIC = @"publicData";
 
 
 @interface AliyunPushManager () <UNUserNotificationCenterDelegate>
-@property (strong, nonatomic) NSMutableArray *allMessageArr;
+//@property (strong, nonatomic) NSMutableArray *allMessageArr;
 @end
 
 @implementation AliyunPushManager
 {
-
+    
 }
 
 
@@ -140,14 +142,14 @@ RCT_EXPORT_METHOD(getDeviceId:(RCTPromiseResolveBlock)resolve
     } else {
         // 或许还没有初始化完成，等3秒钟再次尝试
         [NSThread sleepForTimeInterval:3.0f];
-
+        
         deviceId = [CloudPushSDK getDeviceId];
         if (deviceId!=Nil) {
             resolve(deviceId);
         } else {
             reject([NSString stringWithFormat:@"getDeviceId() failed."], nil, RCTErrorWithMessage(@"getDeviceId() failed."));
         }
-
+        
     }
 }
 
@@ -155,8 +157,8 @@ RCT_EXPORT_METHOD(getDeviceId:(RCTPromiseResolveBlock)resolve
  * bind account to cloud sdk
  */
 RCT_EXPORT_METHOD(bindAccount:(NSString *)account
-                    resolver:(RCTPromiseResolveBlock)resolve
-                    rejecter:(RCTPromiseRejectBlock)reject)
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     [CloudPushSDK bindAccount:account withCallback:^(CloudPushCallbackResult *res) {
         if (res.success) {
@@ -172,7 +174,7 @@ RCT_EXPORT_METHOD(bindAccount:(NSString *)account
  */
 
 RCT_EXPORT_METHOD(unbindAccount:(RCTPromiseResolveBlock)resolve
-                       rejecter:(RCTPromiseRejectBlock)reject)
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     [CloudPushSDK unbindAccount:^(CloudPushCallbackResult *res) {
         if (res.success) {
@@ -240,7 +242,7 @@ RCT_EXPORT_METHOD(listTags:(int)target
                   } else {
                       reject([NSString stringWithFormat:@"%ld",(long)res.error.code], res.error.localizedDescription,res.error);
                   }
-             }];
+              }];
 }
 
 /**
@@ -281,7 +283,7 @@ RCT_EXPORT_METHOD(removeAlias:(NSString *)alias
  */
 
 RCT_EXPORT_METHOD(listAliases:(RCTPromiseResolveBlock)resolve
-                     rejecter:(RCTPromiseRejectBlock)reject)
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
     [CloudPushSDK listAliases:^(CloudPushCallbackResult *res) {
         if (res.success) {
@@ -315,12 +317,29 @@ RCT_EXPORT_METHOD(getAuthorizationStatus:(RCTResponseSenderBlock)callback)
 /**
  * 主动获取本地推送消息数据
  */
-RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
-    if (!self.allMessageArr) {
-        self.allMessageArr = [NSMutableArray array];
-    }
-    resolve(self.allMessageArr);
+//RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+//{
+//    if (!self.allMessageArr) {
+//        self.allMessageArr = [NSMutableArray array];
+//    }
+//    resolve(self.allMessageArr);
+//}
+
+/**
+ * 根据page和account查询Message
+ */
+RCT_EXPORT_METHOD(queryMessages:(NSString *)account page:(int)page resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+    NSMutableArray *arr = [[DWCoreDataTool sharedInstance]queryModelDictWithPage:page account:account];
+    resolve(arr);
+}
+
+/**
+ * 删除数据库message
+ */
+RCT_EXPORT_METHOD(clearAllMessage:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
+    BOOL isOk = [[DWCoreDataTool sharedInstance]deleteData];
+    NSNumber *isOkNumber = [NSNumber numberWithBool:isOk];
+    resolve(isOkNumber);
 }
 
 
@@ -390,7 +409,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
 
 #pragma mark APNs Register
 /**
- *	向APNs注册，获取deviceToken用于推送
+ *    向APNs注册，获取deviceToken用于推送
  *
  */
 - (void)registerAPNs:(void (^)(void))createNotificationCategoryHandler
@@ -404,7 +423,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
         if (createNotificationCategoryHandler) {
             createNotificationCategoryHandler();
         }
-
+        
         
         _notificationCenter.delegate = sharedInstance;
         // 请求推送权限
@@ -500,7 +519,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
     [self sendEventToJs:notificationDict];
     
     // 通知打开回执上报
-    [CloudPushSDK sendNotificationAck:userInfo];    
+    [CloudPushSDK sendNotificationAck:userInfo];
     
     if ([content.body isEqualToString:@""]){
         
@@ -508,7 +527,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
         completionHandler(UNNotificationPresentationOptionNone);
         
     } else {
-    
+        
         // 通知弹出，且带有声音、内容和角标
         completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
         
@@ -562,7 +581,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
         
         
     } else {
-
+        
         // 用户自定义action
         notificationDict[@"actionIdentifier"] =response.actionIdentifier;
         
@@ -591,7 +610,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
     NSMutableDictionary *notificationDict = [NSMutableDictionary dictionary];
     
     // 通知时间
-//    notificationDict[@"date"] = [NSDate init];
+    //    notificationDict[@"date"] = [NSDate init];
     
     // 标题
     notificationDict[@"title"] = @"";
@@ -618,14 +637,14 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
     // 通知打开回执上报
     [CloudPushSDK sendNotificationAck:userInfo];
     
-
+    
     completionHandler(UIBackgroundFetchResultNewData);
 }
 
 
 #pragma mark Channel Opened
 /**
- *	注册推送通道打开监听
+ *    注册推送通道打开监听
  */
 - (void)listenerOnChannelOpened
 {
@@ -637,9 +656,9 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
 }
 
 /**
- *	推送通道打开回调
+ *    推送通道打开回调
  *
- *	@param 	notification
+ *    @param     notification
  */
 - (void)onChannelOpened:(NSNotification *)notification
 {
@@ -648,7 +667,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
 
 #pragma mark Receive Message
 /**
- *	@brief	注册推送消息到来监听
+ *    @brief    注册推送消息到来监听
  */
 - (void)registerMessageReceive
 {
@@ -660,9 +679,9 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
 }
 
 /**
- *	处理到来推送消息
+ *    处理到来推送消息
  *
- *	@param 	notification
+ *    @param     notification
  */
 - (void)onMessageReceived:(NSNotification *)notification
 {
@@ -677,6 +696,9 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
     NSData *dataBody = [strBody dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *bodyDict = [NSJSONSerialization JSONObjectWithData:dataBody options:NSJSONReadingMutableLeaves error:nil];
     notificationDict[@"body"] = bodyDict;
+    //插入数据
+    [[DWCoreDataTool sharedInstance] insertClickedWithDict:bodyDict];
+    
     // 取得通知自定义字段内容
     if (notification.userInfo) {
         notificationDict[@"extras"] = notification.userInfo;
@@ -685,10 +707,10 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
     }
     // 类型 “notification” or "message"
     notificationDict[@"type"] = ALIYUN_PUSH_TYPE_MESSAGE;
-    if (!self.allMessageArr) {
-        self.allMessageArr = [NSMutableArray array];
-    }
-    [self.allMessageArr addObject:notificationDict];
+    //    if (!self.allMessageArr) {
+    //        self.allMessageArr = [NSMutableArray array];
+    //    }
+    //    [self.allMessageArr addObject:notificationDict];
     [self sendEventToJs:notificationDict];
     
 }
@@ -708,7 +730,7 @@ RCT_EXPORT_METHOD(getAllNotificationMessages:(RCTPromiseResolveBlock)resolve rej
             [self sendEventWithName:@"aliyunPushReceived" body:notification];
         }
     });
-
+    
 }
 
 
