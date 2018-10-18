@@ -154,7 +154,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         values.put(key_msgId, msgId);
         values.put(key_timeString, timeString);
 
-        values.put(key_data_time, title);
+        values.put(key_data_title, title);
         values.put(key_data_date, date);
         values.put(key_data_time, time);
         values.put(key_data_account, account);
