@@ -44,9 +44,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             .append("create table ")
             .append(TABLE_NAME)
             .append("(id integer primary key autoincrement,")
-            .append(key_msgId + " integer,")
+            .append(key_msgId + " varchar(64),")
             .append(key_msgtype + " varchar(64),")
-            .append(key_timeString + " varchar(64),")
+            .append(key_timeString + " integer,")
             .append(key_data_title + " varchar(64),")
             .append(key_data_date + " varchar(64),")
             .append(key_data_time + " varchar(64),")
@@ -163,9 +163,9 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     public WritableArray query(String keyAccount, int page, int size) {
         String limit = (page - 1) * size + "," + size;
-        String selection = key_data_account + " = ?";
+        String selection = key_data_account + " = ? or " + key_data_account + " =?";
         String orderBy = key_timeString + " DESC";
-        String[] selectionArgs = new String[]{keyAccount == null ? "" : keyAccount};
+        String[] selectionArgs = new String[]{keyAccount == null ? "" : keyAccount, ""};
         Cursor cursor = database.query(TABLE_NAME, null, "" + selection, selectionArgs, null, null,
                 "" + orderBy, "" + limit);
         WritableArray array = Arguments.createArray();
