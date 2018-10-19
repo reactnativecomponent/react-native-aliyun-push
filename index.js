@@ -106,8 +106,14 @@ export default class AliyunPush {
     static getAllNotificationMessages = (userId) => {
         return AliyunPushNative.getAllNotificationMessages();
     }
-
-
+	// 删除全部消息
+    static clearAllMessage = () => {
+        return AliyunPushNative.clearAllMessage();
+    }
+	// 查询消息
+    static queryMessages = (account,page=1) => {
+        return AliyunPushNative.queryMessages(account,page);
+    }
     static addListener = (callback) => {
 
         AliyunPush._addListener(callback,"aliyunPushReceived");
